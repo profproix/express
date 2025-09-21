@@ -7,7 +7,7 @@
 - [ ] **Configure an express server**
 - [ ] **Configure an express cors**
 - [ ] **Create a GET Route that returns data to the front end**
-- [ ] **Create a POST route that receives data from request parameters**
+- [ ] **Create a GET one route with dynamic parameters**
 
 ## The Request-Response Cycle
 
@@ -113,50 +113,38 @@ app.get('/restaurants', (req, res) => {
 
 </details>
 
-3. Create a POST request that receives data from the client
+3. Create a **GET** request with a dynamic parameter to fetch a single restaurant by its ID.
 
-- Invoke `app.post`, passing it the path `'/restaurants'` and a callback function with parameters `req` and `res`.
-- Inside the callback, create a variable called `newRestaurant` and set it to an object literal. Set the keys of the object to `name`, `address`, `phone`, `cuisine`, `rating`, `hours`, and `menu`. Use the corresponding data from the request body, e.g., `req.body.name`.
-- Push `newRestaurant` to the `restaurants` array.
-- Invoke `res.status(201)` and chain `.json()`, passing `newRestaurant` as the response.
-- Verify your work using Postman.
-  ![postman image select plus button](images/postman1.png)
-- Navigate to a new workspace and select the pluse button
-  ![postman image select POST from method drop down ](images/postman2.png)
-- Click the drop down menu that says GET and select POST
-  ![postman image fill out url, select body, select raw and enter a json object ](images/postman2.png)
-- Enter the **Request URL** to your server.
-- Select the **Body** tab and choose **raw**.
-- Enter a JSON object with keys matching the parameters from your POST request:  
-  `name`, `address`, `phone`, `cuisine`, `rating`, `hours`, and `menu`.
+- Call `app.get` below `app.use(express.json());`, passing it the string `'/restaurants/:id'` and a callback function with parameters `req` and `res`.
+- Inside the callback, use `req.params.id` to access the dynamic value from the URL.
+- Find the restaurant whose `id` matches `req.params.id`.
+- If found, return it with `res.json()`. If not, return a **404** status and an error message.
+- Test the endpoint by visiting a URL such as `http://localhost:3000/restaurants/1` in the browser
 
 <details>
   <summary>Click Here to view solution</summary>
 
 ```
 
-app.post('/restaurants', (req, res) => {
-  const newRestaurant = {
-    id: restaurants.length + 1,
-    name: req.body.name,
-    address: req.body.address,
-    phone: req.body.phone,
-    cuisine: req.body.cuisine,
-    rating: req.body.rating,
-    hours:req.body.hours,
-    menu: req.body.menu
-  };
+app.get('/restaurants/:id', (req, res) => {
+  const restaurantId = parseInt(req.params.id, 10);
+  //Finds the restraunt using the .find method, .filter would work here too.
+  // .find is similar to .filter but it stops at the first resource that matches the condition
+  const restaurant = restaurants.find(r => r.id === restaurantId);
 
-  restaurants.push(newRestaurant);
-  res.status(201).json(newRestaurant);
+  //If the resource doesn't exsist we want to send a 404 status code to our user
+  if (restaurant) {
+    res.json(restaurant);
+  } else {
+    res.status(404).json({ error: 'Resource not found' });
+  }
 });
-
 
 ```
 
 </details>
 
-5. Close down your server by hitting `cmd + c` (on macOS) or `ctrl + c` (on Windows/Linux)
+4. Close down your server by hitting `cmd + c` (on macOS) or `ctrl + c` (on Windows/Linux)
 
 ## Submission Instructions
 
